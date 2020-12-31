@@ -4,39 +4,21 @@ from .models import Customer
 from .models import Medicine
 from .models import Purchase
 from django.shortcuts import render 
+from django.contrib import messages 
 from django.db import IntegrityError
 from django.contrib.auth.forms import UserCreationForm 
+from django.contrib.auth.models import User 
 import cv2
 import numpy as np 
+from django.contrib.auth  import authenticate,  login, logout
+
 #import pytesseract extracting text from images and saving it into databse form.
 #I am coder boy writing an application for crud data 
 def home(request):
-    return render(request, 'pharma/index.html')
+    return render(request, 'pharma/register.html')
 
 def opencam(request):
-    vid = cv2.VideoCapture(0)
-    while(True):
-        # Capture the video frame
-        # by frame
-            ret, frame = vid.read()
-        #It is the attribute that prints the true as well as is webcam is running for the programmes.
-            print(ret)
-        #it is the attribute for that prints the matrxi plot that will store the image.
-            print(frame)
-    #cv2.imwrite(filname="saved_img.jpg", img=frame)
-            cv2.imwrite(filename='saved_img.jpg', img=frame)
-            cv2.imshow('frame', frame)
-        # the 'q' button is set as the
-        # quitting button you may use any
-        # desired button of your choice
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-# After the loop release the cap object
-    vid.release()
-# Destroy all the windows
-    cv2.destroyAllWindows()
-
-
+     return render(request,'pharma/register.html')
 
 def registerpage(request):
     form=UserCreationForm(request.POST)
@@ -47,7 +29,6 @@ def registerpage(request):
 def dealerform(request):
     dict = {'add': True, }
     return render(request, 'pharma/dealer.html', dict)
-
 
 def dealerforminsert(request):
     try:
@@ -74,12 +55,39 @@ def dealerformupdate(request, foo):
         return render(request, "pharma/new.html")
     return render(request, 'pharma/index.html')
 
+def handleSignUp(request):
+    if request.method=="POST":
+        # Get the post parameters
+        username=request.POST['username']
+        email=request.POST['email']
+        fname=request.POST['fname']
+        lname=request.POST['lname']
+        pass1=request.POST['pass1']
+        pass2=request.POST['pass2']
+        
+        # check for errorneous input
+        if (len(username)<10):
+            messages.error(request, " Your user name must be under 10 characters")
+            return render(request,'pharma/register.html')
+
+        if not username.isalnum():
+            messages.error(request, " User name should only contain letters and numbers")
+            return render(request,'pharma/register.html')
+        if (pass1!= pass2):
+            messages.error(request, " Passwords do not match")
+            return render(request,'pharma/register.html')
+        # Create the user
+        myuser = User.objects.create_user(username, email, pass1)
+        myuser.first_name= fname
+        myuser.last_name= lname
+        myuser.save()
+        messages.success(request, " Your coder has been successfully created")
+        return render(request, 'pharma/index.html')
 
 def dealerformview(request, foo):
     dealer = Dealer.objects.get(pk=foo)
     dict = {'dealer': dealer}
     return render(request, 'pharma/dealer.html', dict)
-
 
 def dealerformdelete(request, foo):
     dealer = Dealer.objects.get(pk=foo)
@@ -306,3 +314,20 @@ def purchasetable(request):
     purchase = Purchase.objects.all()
     dict = {"purchase": purchase}
     return render(request, 'pharma/purchasetable.html', dict)
+
+def handeLogin(request):
+    if request.method=="POST":
+        # Get the post parameters
+        loginusername=request.POST['loginusername']
+        loginpassword=request.POST['loginpassword']
+
+        user=authenticate(username= loginusername, password= loginpassword)
+        if user is not None:
+            login(request, user)
+            #messages.success(request, "Successfully Logged In")
+            return render(request,'pharma/index.html')
+        else:
+            #messages.error(request, "Invalid credentials! Please try again")
+            return render(request,'pharma/register.html')
+
+    return HttpResponse("404- Not found")
