@@ -3,14 +3,47 @@ from .models import Employee
 from .models import Customer
 from .models import Medicine
 from .models import Purchase
-from django.shortcuts import render
+from django.shortcuts import render 
 from django.db import IntegrityError
-
-
+from django.contrib.auth.forms import UserCreationForm 
+import cv2
+import numpy as np 
+#import pytesseract extracting text from images and saving it into databse form.
+#I am coder boy writing an application for crud data 
 def home(request):
     return render(request, 'pharma/index.html')
 
+def opencam(request):
+    vid = cv2.VideoCapture(0)
+    while(True):
+        # Capture the video frame
+        # by frame
+            ret, frame = vid.read()
+        #It is the attribute that prints the true as well as is webcam is running for the programmes.
+            print(ret)
+        #it is the attribute for that prints the matrxi plot that will store the image.
+            print(frame)
+    #cv2.imwrite(filname="saved_img.jpg", img=frame)
+            cv2.imwrite(filename='saved_img.jpg', img=frame)
+            cv2.imshow('frame', frame)
+        # the 'q' button is set as the
+        # quitting button you may use any
+        # desired button of your choice
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+# After the loop release the cap object
+    vid.release()
+# Destroy all the windows
+    cv2.destroyAllWindows()
 
+
+
+def registerpage(request):
+    form=UserCreationForm(request.POST)
+    if form.is_valid():
+        form.save()
+    context={'form':form}
+    return render(request,'pharam/register.html')
 def dealerform(request):
     dict = {'add': True, }
     return render(request, 'pharma/dealer.html', dict)
@@ -80,7 +113,7 @@ def empforminsert(request):
         return render(request, "pharma/new.html")
     return render(request, 'pharma/index.html')
 
-
+#Empformda
 def empformupdate(request, foo):
     try:
         emp = Employee.objects.get(pk=foo)
@@ -99,6 +132,7 @@ def empformupdate(request, foo):
 
 def empformview(request, foo):
     emp = Employee.objects.get(pk=foo)
+    li=[]
     dict = {'emp': emp}
     return render(request, 'pharma/emp.html', dict)
 
@@ -118,8 +152,7 @@ def emptable(request):
 def custform(request):
     dict = {'add': True}
     return render(request, 'pharma/cust.html', dict)
-
-
+    
 def custforminsert(request):
     try:
         cust = Customer()
@@ -146,7 +179,6 @@ def custformupdate(request, foo):
     except IntegrityError:
         return render(request, "pharma/new.html")
     return render(request, 'pharma/index.html')
-
 
 def custformview(request, foo):
     cust = Customer.objects.get(pk=foo)
