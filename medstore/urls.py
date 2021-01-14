@@ -21,7 +21,8 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^pharma/', include('pharma.urls')),
     url(r'^$', views.home, name='index'),
-    url(r'login', views.handeLogin, name="handleLogin"),
+   # url(r'login', views.handeLogin, name="handleLogin"),
     #url(r'logout', views.handelLogout, name="handleLogout"),
-    url(r'^signup', views.handleSignUp, name="handleSignUp"),
+    
+    #url(r'^signup', views.handleSignUp, name="handleSignUp"),
 ]

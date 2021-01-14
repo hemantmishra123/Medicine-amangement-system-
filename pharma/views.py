@@ -11,11 +11,42 @@ from django.contrib.auth.models import User
 import cv2
 import numpy as np 
 from django.contrib.auth  import authenticate,  login, logout
+from selenium import webdriver
+import os
+#it is the header decleration for the programme
+import webbrowser
+import time
+from selenium.webdriver.support.ui import Select
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.action_chains import ActionChains
+
 
 #import pytesseract extracting text from images and saving it into databse form.
 #I am coder boy writing an application for crud data 
+#def goto(request):
+
+def music(request):
+    if(request.method=="POST"):
+        string=request.POST['music']
+        return render(request,'pharma/register.html')
+        #string=request.POST['music']
+        #driver=webdriver.Chrome("C:\\Users\\Hemant\\Downloads\\chromedriver_win32\\chromedriver.exe")       driver.get("https://www.youtube.com/")
+        #ele=driver.find_element_by_name("search_query")
+        #print(ele.is_displayed())
+# automate testing in future
+        #ele.send_keys(string)
+        #act=ActionChains(driver)
+        #driver.maximize_window()
+#act.send_keys(Keys.TAB).per    form()  
+        #act.send_keys(Keys.ENTER).perform()
+        #act.send_keys(Keys.ARROW_RIGHT).perform()
+        #act.send_keys(Keys.ENTER).perform()
+        #act.send_keys(Key.TAB).perform()
+    return render(request,'pharma/register.html')
+
+         
 def home(request):
-    return render(request, 'pharma/register.html')
+    return render(request, 'pharma/index.html')
 
 def opencam(request):
      return render(request,'pharma/register.html')
@@ -67,6 +98,7 @@ def handleSignUp(request):
         
         # check for errorneous input
         if (len(username)<10):
+            #it is 
             messages.error(request, " Your user name must be under 10 characters")
             return render(request,'pharma/register.html')
 
@@ -81,14 +113,14 @@ def handleSignUp(request):
         myuser.first_name= fname
         myuser.last_name= lname
         myuser.save()
-        messages.success(request, " Your coder has been successfully created")
+        #messages.success(request, " Your coder has been successfully created")
         return render(request, 'pharma/index.html')
 
 def dealerformview(request, foo):
     dealer = Dealer.objects.get(pk=foo)
     dict = {'dealer': dealer}
     return render(request, 'pharma/dealer.html', dict)
-
+    
 def dealerformdelete(request, foo):
     dealer = Dealer.objects.get(pk=foo)
     dealer.delete()
@@ -321,13 +353,15 @@ def handeLogin(request):
         loginusername=request.POST['loginusername']
         loginpassword=request.POST['loginpassword']
 
-        user=authenticate(username= loginusername, password= loginpassword)
+        user=auth.authenticate(username= loginusername, password= loginpassword)
         if user is not None:
             login(request, user)
-            #messages.success(request, "Successfully Logged In")
+            print('yes')
+            messages.success(request, "Successfully Logged In")
             return render(request,'pharma/index.html')
         else:
-            #messages.error(request, "Invalid credentials! Please try again")
+            print('no')
+            messages.error(request, "Invalid credentials! Please try again")
             return render(request,'pharma/register.html')
 
     return HttpResponse("404- Not found")
